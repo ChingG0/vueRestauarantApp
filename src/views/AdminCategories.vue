@@ -118,7 +118,7 @@ export default {
     },
     createCategories() {
       if (!this.newCategoryName.trim()) return
-      let newId = this.categories.length + 1
+      let newId = this.categories.length+1
       this.categories.push({
         id: newId,
         name: this.newCategoryName

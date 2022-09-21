@@ -44,33 +44,57 @@
 
       <div class="text-center mb-3">
         <p>
-          <router-link to="/signin">
-            Sign In
+          <router-link to="/signup">
+            Sign Up
           </router-link>
         </p>
       </div>
 
       <p class="mt-5 mb-3 text-muted text-center">
-        &copy; 2017-2018
+        &copy; 2022-2023
       </p>
     </form>
   </div>
 </template>
 
+
 <script>
+  /* eslint-disable */
+  const dummyData = {
+    managers: [
+      {
+        email: 'root1234@gmail.com',
+        password: '12345678'
+      }
+    ],
+    users : [
+      {
+        email: 'a12345@gmail.com',
+        password: '12345678'
+      },
+      {
+        email: 'b12345@gmail.com',
+        password: '12345678'
+      }
+    ]
+  }
 export default {
   data() {
     return {
-      email: '',
-      password: '',
+        email: '',
+        password: ''
     }
   },
   methods: {
-    handleSubmit() {
-      console.log('handleSubmit', JSON.stringify({
+    handleSubmit () {
+      const data = JSON.stringify({
         email: this.email,
-        password: this.password,
-      }))
+        password: this.password
+      })
+
+      // TODO: 向後端驗證使用者登入資訊是否合法
+      console.log('data', data)
+      this.$router.push('/restaurants')
     }
   }
 }

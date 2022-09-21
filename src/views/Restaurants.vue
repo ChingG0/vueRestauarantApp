@@ -319,7 +319,8 @@
       }
     },
     created(){
-      this.fetchRestaurants()
+        const {categoryId} = this.$route.query
+        this.fetchRestaurants(categoryId)
     },
     methods: {
       fetchRestaurants(){
@@ -331,7 +332,6 @@
         this.totalPage = totalPage
         this.previousPage = prev
         this.nextPage = next
-
       }
     }
 

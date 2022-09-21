@@ -3,14 +3,14 @@
     <li class="nav-item">
       <router-link
         class="nav-link"
-        :to="{ name: 'restaurants' }"
+        :to="{ name: 'restaurants'}"
       >
         全部
       </router-link>
     </li>
 
     <li
-      v-for="category in categories"
+      v-for="category in categories" 
       :key="category.id"
       class="nav-item"
     >
@@ -31,6 +31,6 @@ export default {
       type: Array,
       required: true
     }
-  }
+  },
 }
 </script>
