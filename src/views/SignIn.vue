@@ -9,36 +9,17 @@
 
       <div class="form-label-group mb-2">
         <label for="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          v-model="email"
-          type="email"
-          class="form-control"
-          placeholder="email"
-          autocomplete="email"
-          required
-        >
+        <input id="email" name="email" v-model="email" type="email" class="form-control" placeholder="email"
+          autocomplete="email" required>
       </div>
 
       <div class="form-label-group mb-3">
         <label for="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          v-model="password"
-          type="password"
-          class="form-control"
-          placeholder="Password"
-          autocomplete="new-password"
-          required
-        >
+        <input id="password" name="password" v-model="password" type="password" class="form-control"
+          placeholder="Password" autocomplete="new-password" required>
       </div>
 
-      <button
-        class="btn btn-lg btn-primary btn-block mb-3"
-        type="submit"
-      >
+      <button class="btn btn-lg btn-primary btn-block mb-3" type="submit" :disabled="isProcessing">
         Submit
       </button>
 
@@ -59,42 +40,59 @@
 
 
 <script>
-  /* eslint-disable */
-  const dummyData = {
-    managers: [
-      {
-        email: 'root1234@gmail.com',
-        password: '12345678'
-      }
-    ],
-    users : [
-      {
-        email: 'a12345@gmail.com',
-        password: '12345678'
-      },
-      {
-        email: 'b12345@gmail.com',
-        password: '12345678'
-      }
-    ]
-  }
+import authorizationAPI from '../apis/authorization';
+import { Toast } from './../utils/helpers'
+
 export default {
   data() {
     return {
-        email: '',
-        password: ''
+      email: '',
+      password: '',
+      isProcessing: false
     }
   },
   methods: {
-    handleSubmit () {
-      const data = JSON.stringify({
-        email: this.email,
-        password: this.password
-      })
+    async handleSubmit() {
+      try {
+        if (!this.email || !this.password) {
+          Toast.fire({
+            icon: 'warning',
+            title: 'Please enter Email and password'
+          })
+          return
+        }
+        this.isProcessing = true
 
-      // TODO: 向後端驗證使用者登入資訊是否合法
-      console.log('data', data)
-      this.$router.push('/restaurants')
+        // TODO: 向後端驗證使用者登入資訊是否合法
+        const response = await authorizationAPI.signIn({
+          email: this.email,
+          password: this.password
+        })
+
+        const { data } = response
+
+        if (data.status !== 'success') {
+          throw new Error(data.message)
+        }
+
+        localStorage.setItem('token', data.token)
+        
+        Toast.fire({
+          icon: 'success',
+          title: '登入成功！'
+        })
+
+        this.$router.push('/restaurants')
+      }
+      catch (error) {
+        this.password = ''
+        this.isProcessing = false
+        Toast.fire({
+          icon: 'warning',
+          title: '帳號或密碼輸入錯誤！'
+        })
+        console.log(error)
+      }
     }
   }
 }

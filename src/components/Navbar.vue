@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
-    <router-link class="navbar-brand" to="/restaurants">
+    <router-link class="navbar-brand" to="/">
       餐廳評論網
     </router-link>
 
