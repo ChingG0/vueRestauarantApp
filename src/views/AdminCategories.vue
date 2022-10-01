@@ -72,19 +72,19 @@ export default {
   components: {
     AdminNav
   },
-  // 3. 定義 Vue 中使用的 data 資料
+
   data() {
     return {
       categories: [],
       newCategoryName: ''
     }
   },
-  // 5. 調用 `fetchCategories` 方法
+
   created() {
     this.fetchCategories()
   },
   methods: {
-    // 4. 定義 `fetchCategories` 方法，把 `dummyData` 帶入 Vue 物件
+
     async fetchCategories() {
       try {
         const { data } = await adminAPI.categories.get()
