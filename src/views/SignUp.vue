@@ -9,65 +9,29 @@
 
       <div class="form-label-group mb-2">
         <label for="name">Name</label>
-        <input
-          id="name"
-          name="name"
-          v-model="name"
-          type="text"
-          class="form-control"
-          placeholder="name"
-          autocomplete="username"
-          required
-          autofocus
-        >
+        <input id="name" name="name" v-model="name" type="text" class="form-control" placeholder="name"
+          autocomplete="username" required autofocus>
       </div>
 
       <div class="form-label-group mb-2">
         <label for="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          v-model="email"
-          type="email"
-          class="form-control"
-          placeholder="email"
-          autocomplete="email"
-          required
-        >
+        <input id="email" name="email" v-model="email" type="email" class="form-control" placeholder="email"
+          autocomplete="email" required>
       </div>
 
       <div class="form-label-group mb-3">
         <label for="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          v-model="password"
-          type="password"
-          class="form-control"
-          placeholder="Password"
-          autocomplete="new-password"
-          required
-        >
+        <input id="password" name="password" v-model="password" type="password" class="form-control"
+          placeholder="Password" autocomplete="new-password" required>
       </div>
 
       <div class="form-label-group mb-3">
         <label for="password-check">Password Check</label>
-        <input
-          id="password-check"
-          name="passwordCheck"
-          v-model="passwordCheck"
-          type="password"
-          class="form-control"
-          placeholder="Password"
-          autocomplete="new-password"
-          required
-        >
+        <input id="password-check" name="passwordCheck" v-model="passwordCheck" type="password" class="form-control"
+          placeholder="Password" autocomplete="new-password" required>
       </div>
 
-      <button
-        class="btn btn-lg btn-primary btn-block mb-3"
-        type="submit"
-      >
+      <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">
         Submit
       </button>
 
@@ -87,6 +51,9 @@
 </template>
 
 <script>
+import authorizationAPI from '../apis/authorization'
+
+import { Toast } from '../utils/helpers'
 export default {
   data() {
     return {
@@ -97,15 +64,46 @@ export default {
     }
   },
   methods: {
-    handleSubmit() {
-      const data = {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck,
+    async handleSubmit() {
+      if (!this.name ||
+        !this.email ||
+        !this.password ||
+        !this.passwordCheck) {
+        Toast.fire({
+          icon: 'warning',
+          title: '請確認已填寫所有欄位'
+        })
+        return
       }
 
-      console.log('handleSubmit', JSON.stringify(data))
+      if (this.password !== this.passwordCheck) {
+        Toast.fire({
+          icon: 'warning',
+          title: '兩次輸入的密碼不同'
+        })
+        this.passwordCheck = ''
+        return
+      }
+
+      try {
+        const { data } = await authorizationAPI.signUp({
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck
+        })
+        
+        if(data.status !== 'success'){
+          throw new Error(data.message)
+        }
+      }
+      catch (err) {
+        console.log(err)
+        Toast.fire({
+          icon: 'error',
+          title: '無法註冊，請稍候再試'
+        })
+      }
     }
   }
 }

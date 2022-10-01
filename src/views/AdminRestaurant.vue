@@ -37,27 +37,8 @@
 </template>
 <script>
 import { emptyImageFilter } from '../utils/mixins'
-const dummyData = {
-  restaurant: {
-    "id": 2,
-    "name": "Dahlia Ankunding",
-    "tel": "052.465.8024",
-    "address": "75167 Nichole Freeway",
-    "opening_hours": "08:00",
-    "description": "Et cumque doloremque dignissimos provident quis.\nEst porro eum accusamus animi neque maiores.\nUnde ipsam molestiae corporis at temporibus ad.\nId rerum amet ut tempore dolores est ea provident atque.",
-    "image": "https://loremflickr.com/320/240/restaurant,food/?random=44.43780352485172",
-    "viewCounts": 0,
-    "createdAt": "2022-09-15T16:02:37.000Z",
-    "updatedAt": "2022-09-15T16:02:37.000Z",
-    "CategoryId": 5,
-    "Category": {
-      "id": 5,
-      "name": "素食料理",
-      "createdAt": "2022-09-15T16:02:37.000Z",
-      "updatedAt": "2022-09-15T16:02:37.000Z"
-    }
-  }
-}
+import adminAPI from '../apis/admin'
+import { Toast } from '../utils/helpers'
 
 export default {
   name: 'AdminRestaurant',
@@ -76,25 +57,39 @@ export default {
       }
     }
   },
-  mounted() {
+  created () {
     const { id: restaurantId } = this.$route.params
     this.fetchRestaurant(restaurantId)
   },
+  beforeRouteUpdate (to, from, next) {
+    const { id } = to.params
+    this.fetchRestaurant(id)
+    next()
+  },
   methods: {
-    /*eslint-disable */
-    fetchRestaurant(restaurantId) {
-      const { restaurant } = dummyData
-      const { id, name, Category, image, opening_hours: openingHours, tel, address, description } = restaurant
-      this.restaurant = {
-        ...this.restaurant,
-        id,
-        name,
-        categoryName: Category ? Category.name : '未分類',
-        image,
-        openingHours,
-        tel,
-        address,
-        description
+    async fetchRestaurant(restaurantId) {
+      try {
+        const { data } = await adminAPI.restaurants.getDetail({restaurantId})
+
+        const { id, name, Category, image, opening_hours: openingHours, tel, address, description } = data.restaurant
+        this.restaurant = {
+          ...this.restaurant,
+          id,
+          name,
+          categoryName: Category ? Category.name : '未分類',
+          image,
+          openingHours,
+          tel,
+          address,
+          description
+        }
+      }
+      catch (err) {
+        console.log(err)
+        Toast.fire({
+          icon: 'error',
+          title: '無法取得餐廳資料，請稍候再試'
+        })
       }
     }
   }

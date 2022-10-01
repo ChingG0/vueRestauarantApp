@@ -9,7 +9,7 @@
           <input type="text" v-model="newCategoryName" class="form-control" placeholder="新增餐廳類別...">
         </div>
         <div class="col-auto">
-          <button type="button" class="btn btn-primary" @click.prevent.stop="createCategories">
+          <button type="button" class="btn btn-primary" @click.prevent.stop="createCategory">
             新增
           </button>
         </div>
@@ -44,10 +44,12 @@
             </span>
           </td>
           <td class="d-flex justify-content-between">
-            <button v-show="!category.isEditing" type="button" class="btn btn-link mr-2" @click.prevent.stop="toggleIsEditing(category.id)">
+            <button v-show="!category.isEditing" type="button" class="btn btn-link mr-2"
+              @click.prevent.stop="toggleIsEditing(category.id)">
               Edit
             </button>
-            <button v-show="category.isEditing" type="button" class="btn btn-link mr-2" @click.prevent.stop="updateCategory({categoryId: category.id, name: category.name})">
+            <button v-show="category.isEditing" type="button" class="btn btn-link mr-2"
+              @click.prevent.stop="updateCategory({categoryId: category.id, name: category.name})">
               Save
             </button>
             <button type="button" class="btn btn-link mr-2" @click.stop.prevent="deleteCategory(category.id)">
@@ -62,35 +64,9 @@
 
 <script>
 import AdminNav from '../components/Admin/AdminNav.vue'
-//  2. 定義暫時使用的資料
-const dummyData = {
-  categories: [
-    {
-      id: 1,
-      name: '中式料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    },
-    {
-      id: 2,
-      name: '日本料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    },
-    {
-      id: 3,
-      name: '義大利料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    },
-    {
-      id: 4,
-      name: '墨西哥料理',
-      createdAt: '2019-06-22T09:00:43.000Z',
-      updatedAt: '2019-06-22T09:00:43.000Z'
-    }
-  ]
-}
+import adminAPI from '../apis/admin'
+import { Toast } from '../utils/helpers'
+
 export default {
   name: 'AdminCategories',
   components: {
@@ -109,32 +85,102 @@ export default {
   },
   methods: {
     // 4. 定義 `fetchCategories` 方法，把 `dummyData` 帶入 Vue 物件
-    fetchCategories() {
-      this.categories = dummyData.categories.map(category => ({
-        ...category,
-        isEditing: false,
-        nameCached: ''
-      }))
+    async fetchCategories() {
+      try {
+        const { data } = await adminAPI.categories.get()
+        this.categories = data.categories.map(category => ({
+          ...category,
+          isEditing: false,
+          nameCached: ''
+        }))
+      }
+      catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法取得餐廳類別，請稍後再試'
+        })
+      }
     },
-    createCategories() {
-      if (!this.newCategoryName.trim()) return
-      let newId = this.categories.length+1
-      this.categories.push({
-        id: newId,
-        name: this.newCategoryName
-      })
-      this.newCategoryName = ''
+    async createCategory() {
+      try {
+        const {data} = await adminAPI.categories.create({name: this.newCategoryName})
+        if(data.status !== 'success'){
+          throw new Error(data.message)
+        }
+
+        if (!this.newCategoryName.trim()) return
+          this.categories.push({
+          id: data.categoryId,
+          name: this.newCategoryName,
+          isEditing: false
+          })
+
+        this.newCategoryName = ''
+        Toast.fire({
+          icon: 'success',
+          title: '成功新增餐廳類別！'
+        })
+      }
+      catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法新增餐廳類別，請稍後再試'
+        })
+      }
+
     },
-    deleteCategory(categoryId) {
-      this.categories = this.categories.filter(category => category.id !== categoryId)
+    async deleteCategory(categoryId) {
+      try{
+        const {data} = await adminAPI.categories.delete({categoryId})
+        
+        if(data.status !== 'success'){
+          throw new Error(data.message)
+        }
+
+        this.categories = this.categories.filter(category => category.id !== categoryId)
+
+        Toast.fire({
+          icon: 'success',
+          title: '成功刪除餐廳類別！'
+        })
+      }
+      catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法刪除餐廳類別，請稍後再試'
+        })
+      }
+      
     },
-    updateCategory({categoryId, name}){
-      this.toggleIsEditing(categoryId)
-      console.log(name)
+    async updateCategory({ categoryId, name }) {
+      try{
+        const {data} = await adminAPI.categories.update({ categoryId, name })
+
+        if(data.status !== 'success'){
+          throw new Error(data.message)
+        }
+
+        this.toggleIsEditing(categoryId)
+
+        Toast.fire({
+          icon: 'success',
+          title: '成功更新餐廳類別！'
+        })
+      }
+      catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法更新分類，請稍後再試'
+        })
+      } 
     },
-    toggleIsEditing(categoryId){
-      this.categories = this.categories.map(category=>{
-        if(category.id === categoryId){
+    toggleIsEditing(categoryId) {
+      this.categories = this.categories.map(category => {
+        if (category.id === categoryId) {
           return {
             ...category,
             isEditing: !category.isEditing,
@@ -144,9 +190,9 @@ export default {
         return category
       })
     },
-    handleCancel(categoryId){
-      this.categories = this.categories.map(category=>{
-        if(category.id === categoryId){
+    handleCancel(categoryId) {
+      this.categories = this.categories.map(category => {
+        if (category.id === categoryId) {
           return {
             ...category,
             name: category.nameCached
@@ -161,31 +207,31 @@ export default {
 }
 </script>
 <style scoped>
-  .category-name {
-    padding: 0.375rem 0.75rem;
-    border: 1px solid transparent;
-    outline: 0;
-    cursor: auto;
-  }
-  
-  .btn-link {
-    width: 62px;
-  }
-  
-  .cancel {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 25px;
-    height: 25px;
-    border: 1px solid #aaaaaa;
-    border-radius: 50%;
-    user-select: none;
-    cursor: pointer;
-    font-size: 12px;
-  }
-  </style>
+.category-name {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid transparent;
+  outline: 0;
+  cursor: auto;
+}
+
+.btn-link {
+  width: 62px;
+}
+
+.cancel {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  border: 1px solid #aaaaaa;
+  border-radius: 50%;
+  user-select: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+</style>
