@@ -1,11 +1,11 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <strong>{{Favorites.length}}</strong> 收藏的餐廳
+      <strong>{{favoritedRestaurants.length}}</strong> 收藏的餐廳
     </div>
     <div class="card-body">
-      <a href="/restaurants/81" v-for="Favorite in Favorites" :key="Favorite.id">
-        <img :src="Favorite.image" width="60" height="60" class="avatar mr-2 p-1" />
+      <a href="/restaurants/81" v-for="favoritedRestaurant in favoritedRestaurants" :key="favoritedRestaurant.id">
+        <img :src="favoritedRestaurant.image" width="60" height="60" class="avatar mr-2 p-1" />
       </a>
     </div>
   </div>
@@ -13,14 +13,9 @@
 <script>
   export default{
     props: {
-      initProfile: {
-        type: Object,
+      favoritedRestaurants: {
+        type: Array,
         required: true
-      }
-    },
-    data(){
-      return {
-        Favorites: this.initProfile.Favorites
       }
     }
   }

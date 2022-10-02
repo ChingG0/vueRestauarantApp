@@ -43,6 +43,7 @@
 import authorizationAPI from '../apis/authorization';
 import { Toast } from './../utils/helpers'
 
+
 export default {
   data() {
     return {
@@ -64,12 +65,10 @@ export default {
         this.isProcessing = true
 
         // TODO: 向後端驗證使用者登入資訊是否合法
-        const response = await authorizationAPI.signIn({
+        const {data} = await authorizationAPI.signIn({
           email: this.email,
           password: this.password
         })
-
-        const { data } = response
 
         if (data.status !== 'success') {
           throw new Error(data.message)
@@ -81,6 +80,8 @@ export default {
           icon: 'success',
           title: '登入成功！'
         })
+
+        this.$store.commit('setCurrentUser', data.user)
 
         this.$router.push('/restaurants')
       }

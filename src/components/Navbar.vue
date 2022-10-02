@@ -17,14 +17,14 @@
         </router-link>
 
         <!-- is user is login -->
-      <template v-if="isAuthenticated">
-        <router-link :to="{name: 'user'}" class="text-white mr-3">
-          {{currentUser.name || '使用者'}} 您好
-        </router-link>
-        <button type="button" class="btn btn-sm btn-outline-success my-2 my-sm-0">
-          登出
-        </button>
-      </template>
+        <template v-if="isAuthenticated">
+          <router-link :to="{name: 'user', params: { id: currentUser.id }}" class="text-white mr-3">
+            {{currentUser.name || '使用者'}} 您好
+          </router-link>
+          <button type="button" class="btn btn-sm btn-outline-success my-2 my-sm-0" @click="logout">
+            登出
+          </button>
+        </template>
 
       </div>
     </div>
@@ -32,41 +32,17 @@
 </template>
 
 <script>
-  /* eslint-disable */
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: '管理者',
-    email: 'root@example.com',
-    image: 'https://i.pravatar.cc/300',
-    isAdmin: true,
-  },
-  isAuthenticated: true,
-}
+import { mapState } from 'vuex'
+
 export default {
-  data() {
-    return {
-      currentUser: {
-        id: -1,
-        name: '',
-        email: '',
-        image: '',
-        isAdmin: false,
-      },
-      isAuthenticated: false
-    }
+  computed: {
+    ...mapState(['currentUser', 'isAuthenticated'])
   },
   methods: {
-    fetchUser(){
-      this.currentUser = {
-        ...this.currentUser,
-        ...dummyUser.currentUser
-      }
-      this.isAuthenticated = dummyUser.isAuthenticated
-    },
-  },
-  created(){
-      this.fetchUser()
+    logout () {
+      this.$store.commit('rmAuthentication')
+      this.$router.push('/signin')
     }
+  }
 }
 </script>

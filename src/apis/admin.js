@@ -10,21 +10,29 @@ export default {
         },
       })
     },
-    create({name}) {
-      return apiHelper.post("/admin/categories",{name},{
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
+    create({ name }) {
+      return apiHelper.post(
+        "/admin/categories",
+        { name },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
     },
-    update({categoryId, name}) {
-      return apiHelper.put(`/admin/categories/${categoryId}`, {name},{
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
+    update({ categoryId, name }) {
+      return apiHelper.put(
+        `/admin/categories/${categoryId}`,
+        { name },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
     },
-    delete({categoryId}) {
+    delete({ categoryId }) {
       return apiHelper.delete(`/admin/categories/${categoryId}`, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -67,6 +75,26 @@ export default {
           Authorization: `Bearer ${getToken()}`,
         },
       })
+    },
+  },
+  users: {
+    get() {
+      return apiHelper.get("/admin/users", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+    },
+    update({ userId, isAdmin }) {
+      return apiHelper.put(
+        `/admin/users/${userId}`,
+        { isAdmin },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
     },
   },
 }

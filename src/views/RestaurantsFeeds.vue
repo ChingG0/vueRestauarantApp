@@ -47,7 +47,6 @@ export default {
     async fetchFeeds() {
       try {
         const {data} = await restaurantsAPI.getFeeds()
-        console.log(data)
         const {restaurants, comments} = data
         this.restaurants = restaurants
         this.comments = comments.filter(comment=>comment.Restaurant && comment.text)

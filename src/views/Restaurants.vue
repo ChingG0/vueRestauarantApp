@@ -50,7 +50,6 @@ export default {
     },
     beforeRouteUpdate(to, from, next){
         const {page='', categoryId=''} = to.query
-        console.log('page', page)
         this.fetchRestaurants({queryPage: page, queryCategoryId: categoryId})
         next()
     },

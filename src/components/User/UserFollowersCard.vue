@@ -1,11 +1,11 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <strong>{{Followers.length}}</strong> followers (追隨者)
+      <strong>{{followers.length}}</strong> followers (追隨者)
     </div>
     <div class="card-body">
-      <a href="/users/51" v-for="Follower in Followers" :key="Follower.id">
-        <img :src="Follower.image" width="60" height="60" class="avatar" />
+      <a href="/users/51" v-for="follower in followers" :key="follower.id">
+        <img :src="follower.image" width="60" height="60" class="avatar" />
       </a>
     </div>
   </div>
@@ -13,15 +13,10 @@
 <script>
   export default{
     props: {
-      initProfile: {
-        type: Object,
+      followers: {
+        type: Array,
         required: true
       }
     },
-    data(){
-      return {
-        Followers: this.initProfile.Followers,
-      }
-    }
   }
 </script>

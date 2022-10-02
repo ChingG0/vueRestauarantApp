@@ -1,53 +1,65 @@
 <template>
-  <form @submit.stop.prevent="handleSubmit()">
+  <form @submit.stop.prevent="handleSubmit">
     <div class="form-group mb-4">
       <label for="text">留下評論：</label>
-      <textarea
-        v-model="text"
-        class="form-control"
-        rows="3"
-        name="text"
-      />
+      <textarea v-model="text" class="form-control" rows="3" name="text" />
     </div>
     <div class="d-flex align-items-center justify-content-between">
-      <button
-        type="button"
-        class="btn btn-link"
-        @click="$router.back()"
-      >回上一頁</button>
-      <button
-        type="submit"
-        class="btn btn-primary mr-0"
-      >
+      <button type="button" class="btn btn-link" @click="$router.back()">回上一頁</button>
+      <button type="submit" class="btn btn-primary mr-0" :disabled="isProcessing">
         Submit
       </button>
     </div>
   </form>
 </template>
 <script>
-import {v4 as uuidv4} from 'uuid'
-export default{
+import commentsAPI from '../../apis/comments'
+import { Toast } from '../../utils/helpers'
+
+export default {
   name: 'CreateComment',
   props: {
-    restaurantId : {
+    restaurantId: {
       type: Number,
       required: true
     }
   },
-  data(){
+  data() {
     return {
-      text: ''
+      text: '',
+      isProcessing: false
     }
   },
   methods: {
-    handleSubmit(){
-     this.$emit('after-create-comment', {
-      commentId: uuidv4(),
-      restaurantId: this.restaurantId,
-      text: this.text
-     })
+    async handleSubmit() {
+      try {
+        if (!this.text) {
+          Toast.fire({
+            icon: 'warning',
+            title: '尚未編輯完評論'
+          })
+          return
+        }
 
-     this.text = ''
+        this.isProcessing = true
+        const { data } = await commentsAPI.create({ restaurantId: this.restaurantId, text: this.text })
+        
+        this.$emit('after-create-comment', {
+          commentId: data.commentId,
+          restaurantId: this.restaurantId,
+          text: this.text
+        })
+       
+        this.isProcessing = false
+        this.text = ''
+      }
+      catch (err) {
+        console.log(err)
+        Toast.fire({
+          icon: 'error',
+          title: '無法新增評論，請稍後再試'
+        })
+      }
     }
   }
 }
