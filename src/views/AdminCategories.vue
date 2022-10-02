@@ -1,6 +1,5 @@
 <template>
   <div class="container py-5">
-    <!-- 1. 使用先前寫好的 AdminNav -->
     <AdminNav />
 
     <form class="my-4">
@@ -15,7 +14,8 @@
         </div>
       </div>
     </form>
-    <table class="table">
+    <Spinner v-if="isLoading"/>
+    <table v-else class="table">
       <thead class="thead-dark">
         <tr>
           <th scope="col" width="60">
@@ -66,17 +66,21 @@
 import AdminNav from '../components/Admin/AdminNav.vue'
 import adminAPI from '../apis/admin'
 import { Toast } from '../utils/helpers'
+import Spinner from '../components/Spinner.vue'
 
 export default {
   name: 'AdminCategories',
   components: {
-    AdminNav
-  },
+    AdminNav,
+    Spinner
+},
 
   data() {
     return {
       categories: [],
-      newCategoryName: ''
+      newCategoryName: '',
+      isProcessing: false,
+      isLoading: true
     }
   },
 
@@ -84,7 +88,6 @@ export default {
     this.fetchCategories()
   },
   methods: {
-
     async fetchCategories() {
       try {
         const { data } = await adminAPI.categories.get()
@@ -93,8 +96,10 @@ export default {
           isEditing: false,
           nameCached: ''
         }))
+        this.isLoading = false
       }
       catch (error) {
+        this.isLoading = false
         console.log(error)
         Toast.fire({
           icon: 'error',

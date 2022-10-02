@@ -1,19 +1,21 @@
 <template>
     <div class="container py-5">
         <NavTabs />
-
-        <!-- Restaurants NavPills-->
         <RestaurantsNavPills :categories="categories" />
+        <Spinner v-if="isLoading" />
+        <template v-else>
+            <div class="row">
+                <RestaurantCard v-for="restaurant in restaurants" :key="restaurant.id" :init-restaurant="restaurant" />
+            </div>
+            
+            <div v-if="restaurants.length < 1 ">
+                此類別目前無餐廳
+            </div>
 
-        <div class="row">
-            <RestaurantCard v-for="restaurant in restaurants" :key="restaurant.id" :init-restaurant="restaurant" />
-            <!-- RestaurantsCard -->
+            <RestaurantsPagination :current-page="currentPage" :total-page="totalPage" :previous-page="previousPage"
+                :next-page="nextPage" :category-id='categoryId' />
 
-        </div>
-        <RestaurantsPagination :current-page="currentPage" :total-page="totalPage" :previous-page="previousPage"
-            :next-page="nextPage" :category-id='categoryId' />
-        <!-- Restaurants Pagination-->
-
+        </template>
     </div>
 </template>
 
@@ -24,6 +26,7 @@ import RestaurantsNavPills from '../components/Restaurants/RestaurantsNavPills.v
 import RestaurantsPagination from '../components/Restaurants/RestaurantsPagination.vue'
 import restaurantsAPI from '../apis/restaurants'
 import { Toast } from '../utils/helpers'
+import Spinner from '../components/Spinner.vue'
 
 export default {
     name: 'Restaurants',
@@ -31,7 +34,8 @@ export default {
         NavTabs,
         RestaurantCard,
         RestaurantsNavPills,
-        RestaurantsPagination
+        RestaurantsPagination,
+        Spinner
     },
     data() {
         return {
@@ -42,15 +46,16 @@ export default {
             totalPage: [],
             previousPage: -1,
             nextPage: -1,
+            isLoading: true
         }
     },
     created() {
-        const  {page='', categoryId=''} = this.$route.query
-        this.fetchRestaurants({ queryPage: page,queryCategoryId: categoryId })
+        const { page = '', categoryId = '' } = this.$route.query
+        this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId })
     },
-    beforeRouteUpdate(to, from, next){
-        const {page='', categoryId=''} = to.query
-        this.fetchRestaurants({queryPage: page, queryCategoryId: categoryId})
+    beforeRouteUpdate(to, from, next) {
+        const { page = '', categoryId = '' } = to.query
+        this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId })
         next()
     },
     methods: {
@@ -68,8 +73,10 @@ export default {
                 this.totalPage = totalPage
                 this.previousPage = prev
                 this.nextPage = next
+                this.isLoading=false
             }
             catch (err) {
+                this.isLoading=false
                 console.log(err)
                 Toast.fire({
                     icon: 'error',

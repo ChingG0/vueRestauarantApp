@@ -87,10 +87,10 @@ export default {
           ... this.restaurant,
           isFavorited: true
         }
-        // Toast.fire({
-        //   icon: 'success',
-        //   title: '成功加入最愛'
-        // })
+        Toast.fire({
+          icon: 'success',
+          title: '成功加入最愛'
+        })
       }
       catch (err) {
         console.log(err)
@@ -169,3 +169,12 @@ export default {
   }
 }
 </script>
+<style scoped>
+  .col-lg-8 p,
+  .contact-info-wrap li,
+  .contact-info-wrap strong {
+    font-family: serif;
+    font-size: 17px;
+  }
+  </style>
+  

@@ -1,7 +1,9 @@
 <template>
   <div class="container py-5">
     <NavTabs />
-    <h1 class="mt-5">
+    <Spinner v-if="isLoading"/>
+    <template v-else>
+      <h1 class="mt-5">
       最新動態
     </h1>
     <hr>
@@ -17,6 +19,7 @@
         <NewestComments :comments="comments" />
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -27,17 +30,20 @@ import NewestRestaurants from '../components/RestaurantsFeeds/NewestRestaurants.
 import NewestComments from '../components/RestaurantsFeeds/NewestComments.vue';
 import restaurantsAPI from '../apis/restaurants'
 import { Toast } from '../utils/helpers'
+import Spinner from '../components/Spinner.vue';
 export default {
   name: 'RestaurantFeeds',
   components: {
     NavTabs,
     NewestRestaurants,
-    NewestComments
-  },
+    NewestComments,
+    Spinner
+},
   data() {
     return {
       restaurants: [],
       comments: [],
+      isLoading: true
     }
   },
   created() {
@@ -50,8 +56,10 @@ export default {
         const {restaurants, comments} = data
         this.restaurants = restaurants
         this.comments = comments.filter(comment=>comment.Restaurant && comment.text)
+        this.isLoading = false
       }
       catch (err) {
+        this.isLoading = false
         Toast.fire({
           icon: 'error',
           title: '無法取得最新動態，請稍後再試'
