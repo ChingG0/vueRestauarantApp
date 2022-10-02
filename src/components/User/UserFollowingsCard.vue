@@ -15,7 +15,7 @@
   export default{
     props: {
       followings: {
-        type: Object,
+        type: Array,
         required: true
       }
     },
